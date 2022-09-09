@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { useEngineStore } from "./stores/engine";
+
 export default {
   data() {
     return {
@@ -46,9 +48,9 @@ export default {
       this.count += 1;
     },
     updateOut() {
-      import("../../pkg").then(
-        (wasm) => (this.out = wasm.ksink(BigInt(this.x), BigInt(this.c)))
-      );
+      useEngineStore()
+        .ksink(this.x, this.c)
+        .then((o) => (this.out = o));
     },
   },
   created() {
