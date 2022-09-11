@@ -1,11 +1,13 @@
 <template>
-  <table>
-    <tr v-for="y in ys" :key="y">
-      <td v-for="x in xs" :key="x">
-        <span class="monospace">{{ table[y][x] }}</span>
-      </td>
-    </tr>
-  </table>
+  <div class="border-2 p-2">
+    <table>
+      <tr v-for="y in ys" :key="y">
+        <td v-for="x in xs" :key="x">
+          <span class="font-mono p-1">{{ table[y][x] }}</span>
+        </td>
+      </tr>
+    </table>
+  </div>
 </template>
 
 <script>

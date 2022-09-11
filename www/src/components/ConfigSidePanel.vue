@@ -1,61 +1,42 @@
 <template>
-  <div class="bg-lightgrey p-05em">
-    <div class="range-input-container p-025em">
-      <span class="monospace delim">Height</span>
-      <span class="monospace">{{ height }}</span>
+  <div class="bg-slate-300 p-6">
+    <labled-slider
+      label="Height"
+      class="py-4"
+      :min="minSize"
+      :max="maxSize"
+      :value="engine.height"
+      @input="(event) => (engine.height = Number(event.target.value))"
+    />
+    <labled-slider
+      label="Width"
+      class="py-4"
+      :min="minSize"
+      :max="maxSize"
+      :value="engine.width"
+      @input="(event) => (engine.width = Number(event.target.value))"
+    />
+    <div class="py-4">
+      <span class="block pb-1">Seed</span>
       <input
-        type="range"
-        :value="height"
-        min="1"
-        max="32"
-        @input="(event) => (height = event.target.value)"
+        class="px-1 block w-full"
+        :value="engine.seed"
+        @input="(event) => (engine.seed = BigInt(event.target.value))"
       />
-    </div>
-    <div class="range-input-container p-025em">
-      <span class="monospace delim">Width</span>
-      <span class="monospace">{{ width }}</span>
-      <input
-        type="range"
-        :value="width"
-        min="1"
-        max="32"
-        @input="(event) => (width = event.target.value)"
-      />
-    </div>
-    <div class="p-025em">
-      <span class="monospace delim">Seed</span>
-      <input v-model="seed" />
     </div>
   </div>
 </template>
 
 <script>
 import { useEngineStore } from "../stores/engine";
+import LabledSlider from "./LabledSlider.vue";
 
 export default {
+  components: { LabledSlider },
   data: () => ({
-    height: useEngineStore().height,
-    width: useEngineStore().width,
-    seed: useEngineStore().seed,
+    engine: useEngineStore(),
+    minSize: 1,
+    maxSize: 32,
   }),
-  watch: {
-    height() {
-      useEngineStore().height = Number(this.height);
-    },
-    width() {
-      useEngineStore().width = Number(this.width);
-    },
-    seed() {
-      useEngineStore().seed = BigInt(this.seed);
-    },
-  },
 };
 </script>
-
-<style scoped>
-.range-input-container {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-</style>
