@@ -5,16 +5,16 @@
       class="py-4"
       :min="minSize"
       :max="maxSize"
-      :value="engine.height"
-      @input="(event) => (engine.height = Number(event.target.value))"
+      :value="engine.resolutionY"
+      @input="(event) => (engine.resolutionY = Number(event.target.value))"
     />
     <labled-slider
       label="Resolution X"
       class="py-4"
       :min="minSize"
       :max="maxSize"
-      :value="engine.width"
-      @input="(event) => (engine.width = Number(event.target.value))"
+      :value="engine.resolutionX"
+      @input="(event) => (engine.resolutionX = Number(event.target.value))"
     />
     <div class="py-4">
       <span class="block pb-1">Seed</span>

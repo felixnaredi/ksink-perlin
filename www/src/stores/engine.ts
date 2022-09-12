@@ -1,26 +1,36 @@
 import { defineStore } from "pinia";
-import { RenderStateDescriptor } from "../../dist/wasm";
+import { RenderPipelineState, RenderStateDescriptor } from "../../dist/wasm";
 
 export const useEngineStore = defineStore("engine", {
   state: () => ({
     seed: BigInt(0),
-    height: Number(5),
-    width: Number(11),
+    resolutionY: Number(5),
+    resolutionX: Number(11),
+    renderPipelineState: null,
   }),
   actions: {
-    async makeRenderState(canvas: HTMLCanvasElement) {
-      return import("../../dist/wasm").then(
-        (wasm) =>
-          new wasm.RenderStateDescriptor(
-            this.height,
-            this.width,
-            this.seed,
-            canvas
-          )
+    setCanvas(canvas: HTMLCanvasElement) {
+      this.renderPipelineState = new RenderPipelineState(canvas);
+    },
+
+    /**
+     * Creates a `RenderStateDescriptor` for a `HTMLCanvasElement`.
+     *
+     * @returns A `RenderStateDescriptor`.
+     */
+    createRenderStateDescriptor() {
+      return new RenderStateDescriptor(
+        this.resolutionY,
+        this.resolutionX,
+        this.seed
       );
     },
-    async render(state: RenderStateDescriptor) {
-      import("../../dist/wasm").then((wasm) => wasm.render(state));
+
+    /**
+     * Renders the current state.
+     */
+    render() {
+      this.renderPipelineState.render(this.createRenderStateDescriptor());
     },
   },
 });

@@ -1,10 +1,5 @@
 <template>
-  <canvas
-    ref="outputTableCanvas"
-    class="border-2"
-    :height="clientHeight"
-    :width="clientWidth"
-  ></canvas>
+  <canvas ref="outputTableCanvas" class="border-2"></canvas>
 </template>
 
 <script>
@@ -13,8 +8,6 @@ import { useEngineStore } from "../stores/engine";
 export default {
   data: () => ({
     engine: useEngineStore(),
-    clientHeight: 0,
-    clientWidth: 0,
   }),
   computed: {
     canvas() {
@@ -22,31 +15,25 @@ export default {
     },
   },
   methods: {
-    range: (n) => {
-      return Array(n)
-        .fill(0)
-        .map((_, i) => i);
-    },
     updateCanvasResolution() {
-      this.clientHeight = this.canvas.clientHeight;
-      this.clientWidth = this.canvas.clientWidth;
-    },
-    draw() {
-      this.engine
-        .makeRenderState(this.canvas)
-        .then((state) => this.engine.render(state));
+      this.canvas.height = this.canvas.clientHeight;
+      this.canvas.width = this.canvas.clientWidth;
     },
   },
   mounted() {
+    this.engine.setCanvas(this.canvas);
+
     this.updateCanvasResolution();
-    this.draw();
+    this.engine.render();
 
     // Redraw canvas when some state of engine changes.
-    this.engine.$subscribe(this.draw);
+    this.engine.$subscribe(this.engine.render);
 
     // Update the size of the canvas and redraw when the window is resized.
-    window.addEventListener("resize", this.updateCanvasResolution);
-    window.addEventListener("resize", this.draw);
+    window.addEventListener("resize", () => {
+      this.updateCanvasResolution();
+      this.engine.render();
+    });
   },
 };
 </script>
