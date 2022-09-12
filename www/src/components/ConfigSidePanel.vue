@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-300 p-6">
+  <div class="bg-slate-300 p-6 h-full">
     <labled-slider
       label="Height"
       class="py-4"
@@ -36,7 +36,7 @@ export default {
   data: () => ({
     engine: useEngineStore(),
     minSize: 1,
-    maxSize: 32,
+    maxSize: 256,
   }),
 };
 </script>

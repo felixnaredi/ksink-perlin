@@ -1,10 +1,9 @@
 <template>
-  <div class="flex justify-between">
-    <div class="pl-6">
-      <h1 class="text-xl py-6">KSINK + Perlin = ❤️</h1>
-      <output-table />
+  <div class="flex justify-between h-screen items-start">
+    <div class="p-6 w-full h-full">
+      <output-table class="w-full h-full" />
     </div>
-    <config-side-panel class="w-64" />
+    <config-side-panel class="w-64 h-full" />
   </div>
 </template>
 
