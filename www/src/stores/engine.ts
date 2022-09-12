@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { RenderStateDescriptor } from "../../dist/wasm";
 
 export const useEngineStore = defineStore("engine", {
   state: () => ({
@@ -7,18 +8,19 @@ export const useEngineStore = defineStore("engine", {
     width: Number(11),
   }),
   actions: {
-    async fill() {
-      return import("../../dist/wasm").then((wasm) =>
-        Array(this.height)
-          .fill(0)
-          .map((_, y) =>
-            Array(this.width)
-              .fill(0)
-              .map((_, x) =>
-                wasm.ksink((BigInt(y) << BigInt(32)) | BigInt(x), this.seed)
-              )
+    async makeRenderState(canvas: HTMLCanvasElement) {
+      return import("../../dist/wasm").then(
+        (wasm) =>
+          new wasm.RenderStateDescriptor(
+            this.height,
+            this.width,
+            this.seed,
+            canvas
           )
       );
+    },
+    async render(state: RenderStateDescriptor) {
+      import("../../dist/wasm").then((wasm) => wasm.render(state));
     },
   },
 });

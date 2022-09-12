@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-8">
-    <span class="col-span-3">{{ label }}</span>
-    <span class="col-span-5">{{ value }}</span>
+    <span class="col-span-6">{{ label }}</span>
+    <span class="col-span-2">{{ value }}</span>
     <input
       type="range"
       class="col-span-8"

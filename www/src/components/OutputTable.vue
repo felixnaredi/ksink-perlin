@@ -32,49 +32,21 @@ export default {
       this.clientWidth = this.canvas.clientWidth;
     },
     draw() {
-      this.engine.fill().then((table) => {
-        let ctx = this.canvas.getContext("2d");
-
-        ctx.save();
-        ctx.transform(
-          this.clientWidth / this.engine.width,
-          0,
-          0,
-          this.clientHeight / this.engine.height,
-          0,
-          0
-        );
-
-        this.range(this.engine.height).forEach((y) => {
-          this.range(this.engine.width).forEach((x) => {
-            const k = Number(table[y][x] % 16n);
-            const g = 17 * k;
-            const b = 17 * (15 - k);
-
-            ctx.fillStyle = `rgba(0, ${g}, ${b}, 255)`;
-            ctx.fillRect(x, y, 1, 1);
-
-            // Stroking the rect lessens artifacts from rounding.
-            ctx.lineWidth = 0.1;
-            ctx.strokeStyle = `rgba(0, ${g}, ${b}, 255)`;
-            ctx.strokeRect(x, y, 1, 1);
-          });
-        });
-
-        ctx.restore();
-      });
+      this.engine
+        .makeRenderState(this.canvas)
+        .then((state) => this.engine.render(state));
     },
   },
   mounted() {
+    this.updateCanvasResolution();
+    this.draw();
+
     // Redraw canvas when some state of engine changes.
     this.engine.$subscribe(this.draw);
 
     // Update the size of the canvas and redraw when the window is resized.
     window.addEventListener("resize", this.updateCanvasResolution);
     window.addEventListener("resize", this.draw);
-
-    this.updateCanvasResolution();
-    this.draw();
   },
 };
 </script>

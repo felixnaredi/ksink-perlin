@@ -1,7 +1,7 @@
 <template>
   <div class="bg-slate-300 p-6 h-full">
     <labled-slider
-      label="Height"
+      label="Resolution Y"
       class="py-4"
       :min="minSize"
       :max="maxSize"
@@ -9,7 +9,7 @@
       @input="(event) => (engine.height = Number(event.target.value))"
     />
     <labled-slider
-      label="Width"
+      label="Resolution X"
       class="py-4"
       :min="minSize"
       :max="maxSize"
