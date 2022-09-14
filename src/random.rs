@@ -13,3 +13,12 @@ pub fn ksink(mut x: u64, mut c: u64) -> u64 {
     }
     x
 }
+
+pub fn phash(mut v: u32) -> u8 {
+    let c = (SQRT3 >> 32) as u32;
+
+    v *= c;
+    v ^= v >> 16;
+    v *= c;
+    (v ^ v >> 16) as u8
+}

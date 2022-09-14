@@ -2,7 +2,13 @@ import { defineStore } from "pinia";
 import {
   RenderPipelineState,
   KSINKOutputTextureDescriptor,
+  PHashOutputTextureDescriptor,
 } from "../../dist/wasm";
+
+export enum Generator {
+  KSINK,
+  PHash,
+}
 
 export const useEngineStore = defineStore("engine", {
   state: () => ({
@@ -10,6 +16,7 @@ export const useEngineStore = defineStore("engine", {
     resolutionY: Number(5),
     resolutionX: Number(11),
     renderPipelineState: null,
+    generator: Generator.KSINK,
   }),
   actions: {
     setCanvas(canvas: HTMLCanvasElement) {
@@ -20,13 +27,23 @@ export const useEngineStore = defineStore("engine", {
      * Renders the current state.
      */
     render() {
-      this.renderPipelineState.render(
-        new KSINKOutputTextureDescriptor(
-          this.resolutionY,
-          this.resolutionX,
-          this.seed
-        ).generate()
-      );
+      if (this.generator == Generator.KSINK) {
+        this.renderPipelineState.render(
+          new KSINKOutputTextureDescriptor(
+            this.resolutionY,
+            this.resolutionX,
+            this.seed
+          ).generate()
+        );
+      } else if (this.generator == Generator.PHash) {
+        this.renderPipelineState.render(
+          new PHashOutputTextureDescriptor(
+            this.resolutionY,
+            this.resolutionX,
+            Number(this.seed)
+          ).generate()
+        );
+      }
     },
   },
 });

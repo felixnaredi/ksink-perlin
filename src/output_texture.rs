@@ -1,4 +1,4 @@
-use crate::random::ksink;
+use crate::random::{ksink, phash};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -24,6 +24,10 @@ pub struct OutputTextureDescriptor<R, S> {
     seed: S,
 }
 
+// -------------------------------------------------------------------------------------------------
+// KSINK
+// -------------------------------------------------------------------------------------------------
+
 #[wasm_bindgen]
 pub struct KSINKOutputTextureDescriptor(OutputTextureDescriptor<u32, u64>);
 
@@ -46,6 +50,42 @@ impl KSINKOutputTextureDescriptor {
                     (0..self.0.resolution_x)
                         .map(|x| {
                             let k = (ksink((y as u64) << 32 | (x as u64), self.0.seed) % 16) as u8;
+                            (0u8, k * 17, (15 - k) * 17, 255u8)
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// PHash
+// -------------------------------------------------------------------------------------------------
+
+#[wasm_bindgen]
+pub struct PHashOutputTextureDescriptor(OutputTextureDescriptor<u8, u8>);
+
+#[wasm_bindgen]
+impl PHashOutputTextureDescriptor {
+    #[wasm_bindgen(constructor)]
+    pub fn new(resolution_y: u8, resolution_x: u8, seed: u8) -> PHashOutputTextureDescriptor {
+        PHashOutputTextureDescriptor(OutputTextureDescriptor {
+            resolution_y,
+            resolution_x,
+            seed,
+        })
+    }
+
+    #[wasm_bindgen]
+    pub fn generate(self) -> OutputTexture {
+        OutputTexture(
+            (0..self.0.resolution_y)
+                .map(|y| {
+                    (0..self.0.resolution_x)
+                        .map(|x| {
+                            let k =
+                                phash((y as u32) << 24 | (x as u32) << 16 | (self.0.seed as u32));
                             (0u8, k * 17, (15 - k) * 17, 255u8)
                         })
                         .collect()
