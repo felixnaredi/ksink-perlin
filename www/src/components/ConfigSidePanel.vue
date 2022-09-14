@@ -3,32 +3,40 @@
     <div class="py-4">
       <span class="block pb-1">Generator</span>
       <select v-model="selectedGenerator" class="w-full py-1">
-        <option value="KSINK">KSINK</option>
-        <option value="PHash">PHash</option>
+        <option
+          v-for="generator in engine.generators"
+          :key="generator.label"
+          :value="generator.label"
+        >
+          {{ generator.label }}
+        </option>
       </select>
     </div>
     <labled-slider
       label="Resolution Y"
       class="py-4"
-      :min="minSize"
-      :max="maxSize"
-      :value="engine.resolutionY"
+      :min="minResolution"
+      :max="maxResolution"
+      :value="engine.clampedResolutionY"
       @input="(event) => (engine.resolutionY = Number(event.target.value))"
     />
     <labled-slider
       label="Resolution X"
       class="py-4"
-      :min="minSize"
-      :max="maxSize"
-      :value="engine.resolutionX"
+      :min="minResolution"
+      :max="maxResolution"
+      :value="engine.clampedResolutionX"
       @input="(event) => (engine.resolutionX = Number(event.target.value))"
     />
     <div class="py-4">
       <span class="block pb-1">Seed</span>
       <input
         class="px-1 block w-full"
-        :value="engine.seed"
-        @input="(event) => (engine.seed = BigInt(event.target.value))"
+        :value="engine.clampedSeed"
+        @input="
+          (event) =>
+            (engine.seed = engine.generator.SeedType(event.target.value))
+        "
       />
     </div>
   </div>
@@ -37,38 +45,27 @@
 <script>
 import { useEngineStore } from "../stores/engine";
 import LabledSlider from "./LabledSlider.vue";
-import { Generator } from "../stores/engine";
 
 export default {
   components: { LabledSlider },
   data: () => ({
     engine: useEngineStore(),
-    minSize: 1,
-    maxSize: 256,
     selectedGenerator: null,
   }),
-  methods: {
-    generatorToString: (generator) => {
-      if (generator == Generator.KSINK) {
-        return "KSINK";
-      } else if (generator == Generator.PHash) {
-        return "PHash";
-      }
+  computed: {
+    minResolution() {
+      return this.engine.generator.minResolution;
     },
-    stringToGenerator: (s) => {
-      if (s == "KSINK") {
-        return Generator.KSINK;
-      } else if (s == "PHash") {
-        return Generator.PHash;
-      }
+    maxResolution() {
+      return Math.min(this.engine.generator.maxResolution, 511);
     },
   },
   created() {
-    this.selectedGenerator = this.generatorToString(this.engine.generator);
+    this.selectedGenerator = this.engine.generator.label;
   },
   watch: {
     selectedGenerator(value) {
-      this.engine.generator = this.stringToGenerator(value);
+      this.engine.setGeneratorByLabel(value);
     },
   },
 };
