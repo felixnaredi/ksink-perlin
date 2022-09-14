@@ -43,7 +43,8 @@ impl KSINKOutputTextureDescriptor {
     }
 
     #[wasm_bindgen]
-    pub fn generate(self) -> OutputTexture {
+    #[allow(non_snake_case)]
+    pub fn generateTexture(self) -> OutputTexture {
         OutputTexture(
             (0..self.0.resolution_y)
                 .map(|y| {
@@ -78,14 +79,16 @@ impl PHashOutputTextureDescriptor {
     }
 
     #[wasm_bindgen]
-    pub fn generate(self) -> OutputTexture {
+    #[allow(non_snake_case)]
+    pub fn generateTexture(self) -> OutputTexture {
         OutputTexture(
             (0..self.0.resolution_y)
                 .map(|y| {
                     (0..self.0.resolution_x)
                         .map(|x| {
                             let k =
-                                phash((y as u32) << 24 | (x as u32) << 16 | (self.0.seed as u32));
+                                phash((y as u32) << 24 | (x as u32) << 16 | (self.0.seed as u32))
+                                    as u8;
                             (0u8, k * 17, (15 - k) * 17, 255u8)
                         })
                         .collect()
