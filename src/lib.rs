@@ -1,3 +1,4 @@
+mod gradient;
 mod output_texture;
 mod random;
 mod utils;

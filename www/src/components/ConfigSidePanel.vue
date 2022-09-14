@@ -39,15 +39,17 @@
         "
       />
     </div>
+    <simple-gradient class="py-4" />
   </div>
 </template>
 
 <script>
 import { useEngineStore } from "../stores/engine";
 import LabledSlider from "./LabledSlider.vue";
+import SimpleGradient from "./SimpleGradient.vue";
 
 export default {
-  components: { LabledSlider },
+  components: { LabledSlider, SimpleGradient },
   data: () => ({
     engine: useEngineStore(),
     selectedGenerator: null,

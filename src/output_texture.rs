@@ -1,4 +1,7 @@
-use crate::random::{ksink, phash};
+use crate::{
+    gradient::{Gradient, WasmGradient},
+    random::{ksink, phash},
+};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -22,6 +25,7 @@ pub struct OutputTextureDescriptor<R, S> {
     resolution_y: R,
     resolution_x: R,
     seed: S,
+    gradient: Gradient,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -34,11 +38,17 @@ pub struct KSINKOutputTextureDescriptor(OutputTextureDescriptor<u32, u64>);
 #[wasm_bindgen]
 impl KSINKOutputTextureDescriptor {
     #[wasm_bindgen(constructor)]
-    pub fn new(resolution_y: u32, resolution_x: u32, seed: u64) -> KSINKOutputTextureDescriptor {
+    pub fn new(
+        resolution_y: u32,
+        resolution_x: u32,
+        seed: u64,
+        gradient: &WasmGradient,
+    ) -> KSINKOutputTextureDescriptor {
         KSINKOutputTextureDescriptor(OutputTextureDescriptor {
             resolution_y,
             resolution_x,
             seed,
+            gradient: gradient.inner().clone(),
         })
     }
 
@@ -50,8 +60,8 @@ impl KSINKOutputTextureDescriptor {
                 .map(|y| {
                     (0..self.0.resolution_x)
                         .map(|x| {
-                            let k = (ksink((y as u64) << 32 | (x as u64), self.0.seed) % 16) as u8;
-                            (0u8, k * 17, (15 - k) * 17, 255u8)
+                            let k = (ksink((y as u64) << 32 | (x as u64), self.0.seed) % 255) as u8;
+                            self.0.gradient.color_at(k).to_tuple()
                         })
                         .collect()
                 })
@@ -70,11 +80,17 @@ pub struct PHashOutputTextureDescriptor(OutputTextureDescriptor<u8, u8>);
 #[wasm_bindgen]
 impl PHashOutputTextureDescriptor {
     #[wasm_bindgen(constructor)]
-    pub fn new(resolution_y: u8, resolution_x: u8, seed: u8) -> PHashOutputTextureDescriptor {
+    pub fn new(
+        resolution_y: u8,
+        resolution_x: u8,
+        seed: u8,
+        gradient: &WasmGradient,
+    ) -> PHashOutputTextureDescriptor {
         PHashOutputTextureDescriptor(OutputTextureDescriptor {
             resolution_y,
             resolution_x,
             seed,
+            gradient: gradient.inner().clone(),
         })
     }
 
@@ -89,7 +105,7 @@ impl PHashOutputTextureDescriptor {
                             let k =
                                 phash((y as u32) << 24 | (x as u32) << 16 | (self.0.seed as u32))
                                     as u8;
-                            (0u8, k * 17, (15 - k) * 17, 255u8)
+                            self.0.gradient.color_at(k).to_tuple()
                         })
                         .collect()
                 })

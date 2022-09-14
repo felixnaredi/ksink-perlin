@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
-import { RenderPipelineState } from "../../dist/wasm";
+import { WasmGradient, RenderPipelineState, Color } from "../../dist/wasm";
 import { KSINK, PHash } from "../library/generator";
+import { Gradient } from "../library/gradient";
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.max(Math.min(value, max), min);
@@ -13,6 +14,7 @@ export const useEngineStore = defineStore("engine", {
     resolutionX: Number(11),
     renderPipelineState: null,
     generator: new KSINK(),
+    gradient: new Gradient(),
   }),
   getters: {
     generators: () => [new KSINK(), new PHash()],
@@ -86,7 +88,8 @@ export const useEngineStore = defineStore("engine", {
           .createOutputTextureDescriptor(
             this.clampedResolutionY,
             this.clampedResolutionX,
-            this.generator.SeedType(this.seed)
+            this.generator.SeedType(this.seed),
+            this.gradient.inner
           )
           .generateTexture()
       );

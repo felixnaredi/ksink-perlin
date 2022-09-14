@@ -2,6 +2,7 @@ import {
   KSINKOutputTextureDescriptor,
   PHashOutputTextureDescriptor,
   OutputTexture,
+  WasmGradient,
 } from "../../dist/wasm";
 
 interface OutputTextureDescriptor {
@@ -19,7 +20,8 @@ interface Generator {
   createOutputTextureDescriptor(
     resolutionY: number,
     resolutionX: number,
-    seed: number | bigint
+    seed: number | bigint,
+    gradient: WasmGradient
   ): OutputTextureDescriptor;
 }
 
@@ -34,9 +36,15 @@ export class KSINK implements Generator {
   public createOutputTextureDescriptor(
     resolutionY: number,
     resolutionX: number,
-    seed: bigint
+    seed: bigint,
+    gradient: WasmGradient
   ) {
-    return new KSINKOutputTextureDescriptor(resolutionY, resolutionX, seed);
+    return new KSINKOutputTextureDescriptor(
+      resolutionY,
+      resolutionX,
+      seed,
+      gradient
+    );
   }
 }
 
@@ -51,8 +59,14 @@ export class PHash implements Generator {
   public createOutputTextureDescriptor(
     resolutionY: number,
     resolutionX: number,
-    seed: number
+    seed: number,
+    gradient: WasmGradient
   ) {
-    return new PHashOutputTextureDescriptor(resolutionY, resolutionX, seed);
+    return new PHashOutputTextureDescriptor(
+      resolutionY,
+      resolutionX,
+      seed,
+      gradient
+    );
   }
 }
