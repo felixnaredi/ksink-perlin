@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
-import { RenderPipelineState, RenderStateDescriptor } from "../../dist/wasm";
+import {
+  RenderPipelineState,
+  KSINKOutputTextureDescriptor,
+} from "../../dist/wasm";
 
 export const useEngineStore = defineStore("engine", {
   state: () => ({
@@ -14,23 +17,16 @@ export const useEngineStore = defineStore("engine", {
     },
 
     /**
-     * Creates a `RenderStateDescriptor` for a `HTMLCanvasElement`.
-     *
-     * @returns A `RenderStateDescriptor`.
-     */
-    createRenderStateDescriptor() {
-      return new RenderStateDescriptor(
-        this.resolutionY,
-        this.resolutionX,
-        this.seed
-      );
-    },
-
-    /**
      * Renders the current state.
      */
     render() {
-      this.renderPipelineState.render(this.createRenderStateDescriptor());
+      this.renderPipelineState.render(
+        new KSINKOutputTextureDescriptor(
+          this.resolutionY,
+          this.resolutionX,
+          this.seed
+        ).generate()
+      );
     },
   },
 });

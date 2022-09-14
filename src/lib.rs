@@ -1,7 +1,8 @@
-mod render_state_descriptor;
+mod output_texture;
+mod random;
 mod utils;
 
-use crate::render_state_descriptor::RenderStateDescriptor;
+use crate::output_texture::OutputTexture;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
@@ -11,22 +12,6 @@ use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-const SQRT3: u64 = 0xBB67AE8584CAA73B;
-const SQRT5: u64 = 0x3C6EF372FE94F82B;
-const SQRT19: u64 = 0x5BE0CD19137E2179;
-
-pub fn ksink(mut x: u64, mut c: u64) -> u64 {
-    for _ in 0..3 {
-        c += SQRT3;
-        c ^= c.rotate_right(49) ^ c.rotate_right(25);
-        x ^= (x >> 47) ^ (x >> 29);
-        x += c;
-        c *= SQRT5;
-        x *= SQRT19;
-    }
-    x
-}
 
 #[wasm_bindgen]
 pub struct RenderPipelineState {
@@ -40,8 +25,10 @@ impl RenderPipelineState {
         RenderPipelineState { canvas }
     }
 
+    /// ## NOTE:
+    /// Textures with a width or height greater than 2^32 can not be rendered.
     #[wasm_bindgen]
-    pub fn render(&self, state: RenderStateDescriptor) -> Result<(), JsValue> {
+    pub fn render(&self, texture: OutputTexture) -> Result<(), JsValue> {
         let context = self
             .canvas
             .get_context("2d")?
@@ -53,15 +40,17 @@ impl RenderPipelineState {
 
         context
             .scale(
-                f64::from(self.canvas.client_width()) / f64::from(*state.resolution_x()),
-                f64::from(self.canvas.client_height()) / f64::from(*state.resolution_y()),
+                f64::from(self.canvas.client_width()) / f64::from(texture.width() as u32),
+                f64::from(self.canvas.client_height()) / f64::from(texture.height() as u32),
             )
             .unwrap();
 
-        for y in 0..*state.resolution_y() {
-            for x in 0..*state.resolution_x() {
-                let k = ksink((y as u64) << 32 | (x as u64), *state.seed()) % 16;
-                let style = JsValue::from(format!("rgba(0, {}, {}", 17 * k, 17 * (15 - k)));
+        for (y, row) in texture.into_rows().enumerate() {
+            for (x, (r, g, b, a)) in row.into_iter().enumerate() {
+                let y = y as u32;
+                let x = x as u32;
+
+                let style = JsValue::from(format!("rgba({}, {}, {}, {})", r, g, b, a));
 
                 context.set_fill_style(&style);
                 context.fill_rect(f64::from(x), f64::from(y), 1.0, 1.0);
