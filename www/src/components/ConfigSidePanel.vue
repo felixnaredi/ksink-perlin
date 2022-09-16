@@ -11,6 +11,7 @@
           {{ generator.label }}
         </option>
       </select>
+      <bit-layout-32 v-if="selectedGenerator == 'PHash'" class="mt-2" />
     </div>
     <labled-slider
       label="Resolution Y"
@@ -29,7 +30,7 @@
       @input="(event) => (engine.resolutionX = Number(event.target.value))"
     />
     <div class="py-4">
-      <span class="block pb-1">Seed</span>
+      <span class="block pb-1">Seed (t)</span>
       <input
         class="px-1 block w-full"
         :value="engine.clampedSeed"
@@ -45,11 +46,12 @@
 
 <script>
 import { useEngineStore } from "../stores/engine";
+import BitLayout32 from "./BitLayout32.vue";
 import LabledSlider from "./LabledSlider.vue";
 import SimpleGradient from "./SimpleGradient.vue";
 
 export default {
-  components: { LabledSlider, SimpleGradient },
+  components: { LabledSlider, SimpleGradient, BitLayout32 },
   data: () => ({
     engine: useEngineStore(),
     selectedGenerator: null,

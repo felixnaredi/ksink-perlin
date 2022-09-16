@@ -15,6 +15,7 @@ export const useEngineStore = defineStore("engine", {
     renderPipelineState: null,
     generator: new KSINK(),
     gradient: new Gradient(),
+    options: {},
   }),
   getters: {
     generators: () => [new KSINK(), new PHash()],
@@ -73,6 +74,7 @@ export const useEngineStore = defineStore("engine", {
       for (const generator of this.generators) {
         if (generator.label == label) {
           this.generator = generator;
+          this.options = generator.options;
           return;
         }
       }
@@ -89,7 +91,8 @@ export const useEngineStore = defineStore("engine", {
             this.clampedResolutionY,
             this.clampedResolutionX,
             this.generator.SeedType(this.seed),
-            this.gradient.inner
+            this.gradient.inner,
+            this.options
           )
           .generateTexture()
       );
